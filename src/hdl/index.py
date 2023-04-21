@@ -8,3 +8,5 @@ SOURCES = (
     f"{SCRIPT_PATH}/sine-generator/sine_wave_generator.vhdl",
     f"{SCRIPT_PATH}/top/top.vhdl",
 )
+
+TOPLEVEL = "top"
