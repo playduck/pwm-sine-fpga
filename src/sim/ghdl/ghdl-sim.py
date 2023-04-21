@@ -35,8 +35,7 @@ args = parser.parse_args()
 
 # clean env
 subprocess.run(generate_cmd([GHDL, "--clean"]), shell=True)
-subprocess.run(generate_cmd(["rm", "./*.o"]), shell=True)
-subprocess.run(generate_cmd(["rm", "./*.cf"]), shell=True)
+subprocess.run(generate_cmd(["rm -rf", "./*"]), shell=True)
 if (args.clean == True):
     exit(0)
 

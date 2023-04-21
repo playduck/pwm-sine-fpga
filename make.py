@@ -40,37 +40,38 @@ PLL_SOURCES = syn_index.PLL_SOURCES
 TOPLEVEL = hdl_index.TOPLEVEL
 
 parser = argparse.ArgumentParser("pwm-sine make")
-parser.add_argument("action", help="Action to perform")
+parser.add_argument("action", nargs='*', help="Actions to perform")
 args = parser.parse_args()
 
-match args.action:
-    case "clean":
-        s.printc(s.INFO, s.GREEN + "Clean")
-        subprocess.run([PLL_SCRIPT, "clean"])
-        subprocess.run(["python3", "-m", SIM_GHDL_SCRIPT, "--clean"])
-        subprocess.run(["python3", "-m", SYN_SCRIPT, "--clean"])
+for action in args.action:
+    match action:
+        case "clean":
+            s.printc(s.INFO, s.GREEN + "Clean")
+            subprocess.run([PLL_SCRIPT, "clean"])
+            subprocess.run(["python3", "-m", SIM_GHDL_SCRIPT, "--clean"])
+            subprocess.run(["python3", "-m", SYN_SCRIPT, "--clean"])
 
-    case "sim":
-        s.printc(s.INFO, s.GREEN + "Sim")
-        SOURCES = COMMON_SOURCES + SIM_SOURCES
-        subprocess.run(["python3", "-m", SIM_GHDL_SCRIPT, "--stop-time=1ms", str(SOURCES)])
+        case "sim":
+            s.printc(s.INFO, s.GREEN + "Sim")
+            SOURCES = COMMON_SOURCES + SIM_SOURCES
+            subprocess.run(["python3", "-m", SIM_GHDL_SCRIPT, "--stop-time=1ms", str(SOURCES)])
 
-    case "pll":
-        s.printc(s.INFO, s.GREEN + "Pll")
-        subprocess.run([PLL_SCRIPT, "generate"])
+        case "pll":
+            s.printc(s.INFO, s.GREEN + "Pll")
+            subprocess.run([PLL_SCRIPT, "generate"])
 
-    case "syn":
-        SOURCES = COMMON_SOURCES
-        s.printc(s.INFO, s.GREEN + "Syn")
-        print(SOURCES, PLL_SOURCES)
-        subprocess.run(["python3", "-m", SYN_SCRIPT, str(SOURCES), str(PLL_SOURCES), str(TOPLEVEL)])
+        case "syn":
+            SOURCES = COMMON_SOURCES
+            s.printc(s.INFO, s.GREEN + "Syn")
+            print(SOURCES, PLL_SOURCES)
+            subprocess.run(["python3", "-m", SYN_SCRIPT, str(SOURCES), str(PLL_SOURCES), str(TOPLEVEL)])
 
-    case "prog":
-        s.printc(s.INFO, s.GREEN + "Prog")
-        subprocess.run([PROG_SCRIPT, TOPLEVEL])
+        case "prog":
+            s.printc(s.INFO, s.GREEN + "Prog")
+            subprocess.run([PROG_SCRIPT, TOPLEVEL])
 
-    case "flash":
-        s.printc(s.INFO, s.GREEN + "Flash")
+        case "flash":
+            s.printc(s.INFO, s.GREEN + "Flash")
 
-    case other:
-        s.printc(s.ERROR, f"no action for target '{args.action}'")
+        case other:
+            s.printc(s.ERROR, f"no action for target '{args.action}'")
