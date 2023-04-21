@@ -1,6 +1,6 @@
 
-./out
-./pll
+./out/*
+./pll/*
 
 !./pll/*.sh
 !./.gitignore
