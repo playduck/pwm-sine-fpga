@@ -48,6 +48,7 @@ match args.action:
         s.printc(s.INFO, s.GREEN + "Clean")
         subprocess.run([PLL_SCRIPT, "clean"])
         subprocess.run(["python3", "-m", SIM_GHDL_SCRIPT, "--clean"])
+        subprocess.run(["python3", "-m", SYN_SCRIPT, "--clean"])
 
     case "sim":
         s.printc(s.INFO, s.GREEN + "Sim")

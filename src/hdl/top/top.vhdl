@@ -18,6 +18,7 @@ architecture behavioral of top is
 
     signal sine_out : std_logic_vector(BIT_DEPTH - 1 downto 0) := (others => '0');
     signal sync_out : std_logic                                := '0';
+    signal mclk : std_logic := '0';
 
     component sine_wave_generator is
         generic (
@@ -42,15 +43,23 @@ architecture behavioral of top is
         );
     end component;
 
-    -- component epll is
-    --     port (
-    --         clkin : in std_logic;
-    --         clkout0 : out std_logic;
-    --         locked : out std_logic
-    --     );
-    -- end component;
+    component pll0 is
+        port (
+            clkin : in std_logic;
+            clkout0 : out std_logic;
+            locked : out std_logic
+        );
+    end component;
 
 begin
+
+    clk_pll1:  pll0
+    port map (
+        clkin => clk_in,
+        clkout0 => mclk,
+        locked => open
+	);
+    -- mclk <= clk_in;
 
     -- sine wave generator is clocked by the 50% pulse of the pwm generator
     -- each pwm generation thus generates a new sine wave sample
