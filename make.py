@@ -6,10 +6,14 @@ import os
 import subprocess
 import sys
 
+from src.util import style as s
+
+os.system("")
+
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 PLL_SCRIPT = f"{SCRIPT_PATH}/src/syn/pll/gen-pll.sh"
 
-SIM_GHDL_SCRIPT = f"{SCRIPT_PATH}/src/sim/ghdl/ghdl-sim.py"
+SIM_GHDL_SCRIPT = f"src.sim.ghdl.ghdl-sim"
 
 HDL_INDEX_PATH = f"{SCRIPT_PATH}/src/hdl/index.py"
 SIM_INDEX_PATH = f"{SCRIPT_PATH}/src/sim/index.py"
@@ -38,28 +42,28 @@ args = parser.parse_args()
 
 match args.action:
     case "clean":
-        print("Clean")
+        s.printc(s.INFO, s.GREEN + "Clean")
         subprocess.run([PLL_SCRIPT, "clean"])
-        subprocess.run([SIM_GHDL_SCRIPT, "--clean"])
+        subprocess.run(["python3", "-m", SIM_GHDL_SCRIPT, "--clean"])
 
     case "sim":
-        print("Sim")
+        s.printc(s.INFO, s.GREEN + "Sim")
         SOURCES = COMMON_SOURCES + SIM_SOURCES
-        subprocess.run([SIM_GHDL_SCRIPT, "--stop-time=1ms", str(SOURCES)])
+        subprocess.run(["python3", "-m", SIM_GHDL_SCRIPT, "--stop-time=1ms", str(SOURCES)])
 
     case "pll":
-        print("Generating PLLs")
+        s.printc(s.INFO, s.GREEN + "Pll")
         subprocess.run([PLL_SCRIPT, "generate"])
 
     case "syn":
         SOURCES = COMMON_SOURCES
-        print("Synthesis")
+        s.printc(s.INFO, s.GREEN + "Syn")
 
     case "prog":
-        print("Programm")
+        s.printc(s.INFO, s.GREEN + "Prog")
 
     case "flash":
-        print("Flash")
+        s.printc(s.INFO, s.GREEN + "Flash")
 
     case other:
-        print(f"no action for target '{args.action}'")
+        s.printc(s.ERROR, f"no action for target '{args.action}'")

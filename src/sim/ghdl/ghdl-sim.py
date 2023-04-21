@@ -7,6 +7,10 @@ import sys
 from ast import literal_eval as make_tuple
 import time
 
+from ...util import style as s
+
+os.system("")
+
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 VCD_OUTPUT = f"{SCRIPT_PATH}/wave"
 OUTPUT_PATH = f"{SCRIPT_PATH}/out"
@@ -49,64 +53,65 @@ SIMFLAGS = f"--vcd={VCD_FILE} --stop-time={args.stop_time}"
 SOURCES = make_tuple(args.sources)
 
 # analyzing files
-print("running analysis")
+s.printc(s.INFO, "running analysis")
 for source in SOURCES:
-    print(f"analyzing {source}")
+    s.printc(s.INFO, f"analyzing {source}")
     try:
         result = subprocess.run(generate_cmd(
             [GHDL, "-a", CFLAGS, source]), check=True, shell=True)
     except subprocess.CalledProcessError as e:
-        print(f"cannot analyze {source} with code {e.returncode}")
-        print(e.cmd)
+
+        s.printc(s.ERROR, f"cannot analyze {source} with code {s.BLUE}{e.returncode}")
+        s.printc(s.ERROR, e.cmd)
         exit(1)
     else:
-        print(f"finished {source} with code {result.returncode}")
+        s.printc(s.INFO, f"finished {source} with code {s.BLUE}{result.returncode}")
 
 # finding top file
 if (args.top):
     TOP = args.top
 else:
-    print("finding top")
+    s.printc(s.INFO, "finding top")
     try:
         result = subprocess.run(generate_cmd(
             [GHDL, "--find-top", CFLAGS]), shell=True, check=True, capture_output=True)
     except subprocess.CalledProcessError as e:
-        print(f"failed while finding top with code {e.returncode}")
-        print(e.cmd)
+        s.printc(s.ERROR, f"failed while finding top with code {s.BLUE}{e.returncode}")
+        s.printc(s.ERROR, e.cmd)
         exit(1)
     else:
         if (result.stdout == None):
-            print(result)
-            print(f"failed to find top ({result.stdout})")
+            s.printc(s.ERROR, result)
+            s.printc(s.ERROR, f"failed to find top {s.BLUE}{result.stdout}")
             exit(1)
         else:
             TOP = result.stdout.decode('utf-8').rstrip()
 
-print(f"top = {TOP}")
+s.printc(s.INFO, f"top = {s.BLUE}{TOP}")
 
 # elaborating top
-print("running elaboration")
+s.printc(s.INFO, "running elaboration")
 try:
     result = subprocess.run(generate_cmd(
         [GHDL, "-e", CFLAGS, TOP]), check=True, shell=True)
 except subprocess.CalledProcessError as e:
-    print(f"cannot elaborate {TOP} with code {e.returncode}")
-    print(e.cmd)
+    s.printc(s.ERROR, f"cannot elaborate {TOP} with code {s.BLUE}{e.returncode}")
+    s.printc(s.ERROR, e.cmd)
     exit(1)
 else:
-    print(f"finished elaboration with code {result.returncode}")
+    s.printc(s.INFO, f"finished elaboration with code {s.BLUE}{result.returncode}")
 
 # simulating
-print("running simulation")
+s.printc(s.INFO, "running simulation")
 t = time.process_time()
 try:
     result = subprocess.run(generate_cmd(
         [GHDL, "-r", TOP, SIMFLAGS]), check=True, shell=True)
 except subprocess.CalledProcessError as e:
-    print(f"cannot simulate {TOP} with code {e.returncode}")
-    print(e.cmd)
+    s.printc(s.ERROR, f"cannot simulate {TOP} with code {s.BLUE}{e.returncode}")
+    s.printc(s.ERROR, e.cmd)
     exit(1)
 else:
     elapsed_time = time.process_time() - t
-    print(f"finished simulation with code {result.returncode}")
-    print(f"simulation took {elapsed_time}s")
+    s.printc(s.INFO, f"finished simulation with code {s.BLUE}{result.returncode}")
+    s.printc(s.INFO, f"simulation took {s.BLUE}{elapsed_time}s")
