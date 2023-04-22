@@ -5,8 +5,8 @@ library work;
 
 entity top is
     generic (
-        BIT_DEPTH     : natural := 16;
-        SAMPLE_AMOUNT : natural := 256
+        BIT_DEPTH     : natural := 8;
+        SAMPLE_AMOUNT : natural := 64
     );
     port (
         clk_in  : in std_logic;         -- clk input
@@ -42,25 +42,7 @@ architecture behavioral of top is
             sync_out    : out std_logic
         );
     end component;
-
-    component pll0 is
-        port (
-            clkin : in std_logic;
-            clkout0 : out std_logic;
-            locked : out std_logic
-        );
-    end component;
-
 begin
-
-    clk_pll1:  pll0
-    port map (
-        clkin => clk_in,
-        clkout0 => mclk,
-        locked => open
-	);
-    -- mclk <= clk_in;
-
     -- sine wave generator is clocked by the 50% pulse of the pwm generator
     -- each pwm generation thus generates a new sine wave sample
     SWG : sine_wave_generator
@@ -77,5 +59,4 @@ begin
         pwm_out     => pwm_out,
         sync_out    => sync_out
     );
-
 end behavioral;

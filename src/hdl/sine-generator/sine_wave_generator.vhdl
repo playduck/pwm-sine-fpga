@@ -11,7 +11,7 @@ entity sine_wave_generator is
     );
     port (
         clk      : in std_logic;                                -- clock input
-        sine_out : out std_logic_vector(BIT_DEPTH - 1 downto 0) -- sine wave output
+        sine_out : out std_logic_vector(BIT_DEPTH - 1 downto 0) := (others => '0') -- sine wave output
     );
 end sine_wave_generator;
 
@@ -36,7 +36,7 @@ architecture rtl of sine_wave_generator is
 
     -- state to keep track which quadrant of the quarter wave are currently in
     type quadrant_t is (Q0, Q1, Q2, Q3);
-    signal quadrant : quadrant_t := Q0; -- start in Q0
+    signal quadrant : quadrant_t := Q3; -- start in Q3, as the wave ramps up from it's minimum
 
 begin
     process (clk)

@@ -19,10 +19,6 @@ architecture sim of top_tb is
     signal pwm : std_logic := '0';
 
     component top is
-        generic (
-            BIT_DEPTH     : natural := 8;
-            SAMPLE_AMOUNT : natural := 64
-        );
         port (
             clk_in  : in std_logic;
             pwm_out : out std_logic
@@ -42,7 +38,7 @@ begin
     begin
         wait for 10 ns;
         -- this process generates the clock signal that will be used to drive the sine waveform generator module.
-        while now < 1000 us loop
+        while now < 1 sec loop
             clk <= not clk;
             wait for CLK_PERIOD/2;
         end loop;

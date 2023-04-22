@@ -4,6 +4,7 @@ import subprocess
 import sys
 from ast import literal_eval as make_tuple
 import time
+from timeit import default_timer as timer
 
 from ...util import style as s
 
@@ -12,13 +13,15 @@ os.system("")
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 VCD_OUTPUT = f"{SCRIPT_PATH}/wave"
 OUTPUT_PATH = f"{SCRIPT_PATH}/out"
-CFLAGS = "--std=08 -frelaxed -Wno-binding -Wno-shared"
+CFLAGS = "-v --std=08 -frelaxed -Wno-binding -Wno-shared"
 GHDL = "ghdl"
 
 
 def generate_cmd(cmd):
     # prepend output directory to the command
-    return f"cd {OUTPUT_PATH}; "+" ".join(cmd)
+    cmd = f"cd {OUTPUT_PATH}; "+" ".join(cmd)
+    print(cmd)
+    return cmd
 
 
 # parsing args
@@ -36,6 +39,7 @@ args = parser.parse_args()
 # clean env
 subprocess.run(generate_cmd([GHDL, "--clean"]), shell=True)
 subprocess.run(generate_cmd(["rm -rf", "./*"]), shell=True)
+subprocess.run(generate_cmd(["rm -rf", "./../wave/*"]), shell=True)
 if (args.clean == True):
     exit(0)
 
@@ -46,8 +50,10 @@ if (args.unique == True):
 else:
     VCD_FILE = f"{VCD_OUTPUT}/wave.vcd"
 
-SIMFLAGS = f"--vcd={VCD_FILE} --stop-time={args.stop_time}"
+SIMFLAGS = f"--stop-time={args.stop_time} --stop-delta=10000 --vcd={VCD_FILE}"
 SOURCES = make_tuple(args.sources)
+
+t = timer()
 
 # analyzing files
 s.printc(s.INFO, "running analysis")
@@ -61,8 +67,6 @@ for source in SOURCES:
         s.printc(s.ERROR, f"cannot analyze {source} with code {s.BLUE}{e.returncode}")
         s.printc(s.ERROR, e.cmd)
         exit(1)
-    else:
-        s.printc(s.INFO, f"finished {source} with code {s.BLUE}{result.returncode}")
 
 # finding top file
 if (args.top):
@@ -95,20 +99,17 @@ except subprocess.CalledProcessError as e:
     s.printc(s.ERROR, f"cannot elaborate {TOP} with code {s.BLUE}{e.returncode}")
     s.printc(s.ERROR, e.cmd)
     exit(1)
-else:
-    s.printc(s.INFO, f"finished elaboration with code {s.BLUE}{result.returncode}")
 
 # simulating
 s.printc(s.INFO, "running simulation")
-t = time.process_time()
 try:
     result = subprocess.run(generate_cmd(
-        [GHDL, "-r", TOP, SIMFLAGS]), check=True, shell=True)
+        [GHDL, "-r", CFLAGS, TOP, SIMFLAGS]), check=True, shell=True)
 except subprocess.CalledProcessError as e:
     s.printc(s.ERROR, f"cannot simulate {TOP} with code {s.BLUE}{e.returncode}")
     s.printc(s.ERROR, e.cmd)
     exit(1)
 else:
-    elapsed_time = time.process_time() - t
+    elapsed_time = timer() - t
     s.printc(s.INFO, f"finished simulation with code {s.BLUE}{result.returncode}")
     s.printc(s.INFO, f"simulation took {s.BLUE}{elapsed_time}s")
