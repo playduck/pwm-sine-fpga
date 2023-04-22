@@ -27,7 +27,7 @@ def generate_cmd(cmd):
 # parsing args
 parser = argparse.ArgumentParser("ghdl-sim")
 parser.add_argument("sources", nargs='?', help="source files in order")
-parser.add_argument("top", nargs='?', help="top module")
+parser.add_argument("top", help="top module")
 parser.add_argument('-c', '--clean', dest="clean",
                     action='store_true', help="clean generated files")
 parser.add_argument('-u', '--unique', dest="unique",
@@ -37,18 +37,21 @@ parser.add_argument("--stop-time", dest="stop_time", type=str,
 args = parser.parse_args()
 
 # clean env
-subprocess.run(generate_cmd([GHDL, "--clean"]), shell=True)
-subprocess.run(generate_cmd(["rm -rf", "./*"]), shell=True)
-subprocess.run(generate_cmd(["rm -rf", "./../wave/*"]), shell=True)
 if (args.clean == True):
+    subprocess.run(generate_cmd([GHDL, "--clean"]), shell=True)
+    subprocess.run(generate_cmd(["rm -rf", "./*"]), shell=True)
+    subprocess.run(generate_cmd(["rm -rf", "./../wave/*"]), shell=True)
     exit(0)
+
+TOP = args.top
+s.printc(s.INFO, f"top = {s.BLUE}{TOP}")
 
 # create constants from args
 if (args.unique == True):
     TIME_FORMAT = "%Y-%m-%d-%H-%M-%S"
-    VCD_FILE = f"{VCD_OUTPUT}/wave-{time.strftime(TIME_FORMAT, time.localtime())}.vcd"
+    VCD_FILE = f"{VCD_OUTPUT}/{TOP}-{time.strftime(TIME_FORMAT, time.localtime())}.vcd"
 else:
-    VCD_FILE = f"{VCD_OUTPUT}/wave.vcd"
+    VCD_FILE = f"{VCD_OUTPUT}/{TOP}.vcd"
 
 SIMFLAGS = f"--stop-time={args.stop_time} --stop-delta=10000 --vcd={VCD_FILE}"
 SOURCES = make_tuple(args.sources)
@@ -67,28 +70,6 @@ for source in SOURCES:
         s.printc(s.ERROR, f"cannot analyze {source} with code {s.BLUE}{e.returncode}")
         s.printc(s.ERROR, e.cmd)
         exit(1)
-
-# finding top file
-if (args.top):
-    TOP = args.top
-else:
-    s.printc(s.INFO, "finding top")
-    try:
-        result = subprocess.run(generate_cmd(
-            [GHDL, "--find-top", CFLAGS]), shell=True, check=True, capture_output=True)
-    except subprocess.CalledProcessError as e:
-        s.printc(s.ERROR, f"failed while finding top with code {s.BLUE}{e.returncode}")
-        s.printc(s.ERROR, e.cmd)
-        exit(1)
-    else:
-        if (result.stdout == None):
-            s.printc(s.ERROR, result)
-            s.printc(s.ERROR, f"failed to find top {s.BLUE}{result.stdout}")
-            exit(1)
-        else:
-            TOP = result.stdout.decode('utf-8').rstrip()
-
-s.printc(s.INFO, f"top = {s.BLUE}{TOP}")
 
 # elaborating top
 s.printc(s.INFO, "running elaboration")

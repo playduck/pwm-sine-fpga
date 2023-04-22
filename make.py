@@ -56,8 +56,9 @@ for action in args.action:
         case "sim":
             s.printc(s.INFO, s.GREEN + "Sim")
             SOURCES = COMMON_SOURCES + SIM_SOURCES
-            TOPLEVEL = sim_index.SIM_TOPFILE
-            subprocess.run(["python3", "-m", SIM_GHDL_SCRIPT, "--stop-time=2ms", str(SOURCES), str(TOPLEVEL)])
+            for TOPLEVEL in sim_index.SIM_TOPFILES:
+                s.printc(s.INFO, s.GREEN + "Simulating " + s.BLUE + TOPLEVEL)
+                subprocess.run(["python3", "-m", SIM_GHDL_SCRIPT, "--stop-time=2ms", str(SOURCES), str(TOPLEVEL)])
 
         case "pll":
             s.printc(s.INFO, s.GREEN + "Pll")
