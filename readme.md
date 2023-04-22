@@ -1,4 +1,4 @@
-# pwm-sine
+# pwm-sine-fpga
 
 A simple VHDL blinky for Lattice ECP5 FPGAs.
 This pulses a LED using PWM in a sine-wave pattern.
