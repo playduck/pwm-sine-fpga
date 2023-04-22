@@ -33,7 +33,7 @@ architecture behavioral of top_syn is
     signal mclk : std_logic := '0';
 
 begin
-    clk_pll1:  pll0
+    clk_pll0:  pll0
     port map (
         clkin => clk_in,
         clkout0 => mclk,

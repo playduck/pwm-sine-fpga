@@ -5,8 +5,7 @@ cd $(dirname "$0")
 # define frequencies in MHz
 f_in=25
 f_out=(
-    48
-    192
+    50
 )
 
 # always clean last generation
@@ -16,7 +15,7 @@ if [ "$1" == "clean" ]; then
     # if we're only meant to clean, then exit now
     exit
 elif [ "$1" == "generate" ]; then
-    # generate ecopll calls for all frequencies
+    # generate ecppll calls for all frequencies
     for i in "${!f_out[@]}"
     do
         name="pll${i}"

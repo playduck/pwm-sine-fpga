@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-from enum import Enum
-
 class style():
     BOLD = '\033[1m'
     BLACK = '\033[30m'
